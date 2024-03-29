@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>CR501 Advancing Autonomous Mobile Robots with the Dynamic Window Approach</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Yuhao Chen" />
+    <meta name="date" content="2024-03-29" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <script src="libs/js-cookie/js.cookie.js"></script>
+    <script src="libs/peerjs/peerjs.min.js"></script>
+    <script src="libs/tiny.toast/toast.min.js"></script>
+    <link href="libs/xaringanExtra-broadcast/broadcast.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-broadcast/broadcast.js"></script>
+    <script src="libs/freezeframe/freezeframe.min.js"></script>
+    <script src="libs/xaringanExtra-freezeframe/freezeframe-init.js"></script>
+    <script id="xaringanExtra-freezeframe-options" type="application/json">{"selector":"img[src$=\"gif\"]","trigger":"click","overlay":false,"responsive":true,"warnings":true}</script>
+    <script src="libs/fabric/fabric.min.js"></script>
+    <link href="libs/xaringanExtra-scribble/scribble.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-scribble/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="libs/mark.js/mark.min.js"></script>
+    <link href="libs/xaringanExtra-search/search.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-search/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":true,"autoSearch":false}) })</script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xbf37dfe4c6e45738639d61a14809d52","expires":1}</script>
+    <script src="libs/himalaya/himalaya.js"></script>
+    <link href="libs/editable/editable.css" rel="stylesheet" />
+    <script src="libs/editable/editable.js"></script>
+    <script src="libs/xaringanExtra_fit-screen/fit-screen.js"></script>
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# CR501 Advancing Autonomous Mobile Robots with the Dynamic Window Approach
+]
+.author[
+### Yuhao Chen
+]
+.institute[
+### University Nottingham Ningbo, China
+]
+.date[
+### 2024-03-29
+]
+
+---
+
+
+
+
+
+# Contents
+
+## 1. Introduction
+
+## 2. System structure
+
+## 3. Reflection
+
+---
+# Introduction I
+
+## Fuzzy Logic
+
+- Components: fuzzifier, rules, an inference engine, and a defuzzifier
+
+&lt;br/&gt;
+
+&lt;img src="./assets/fuzzylogic_architecture.png" width="80%" style="display: block; margin: auto;" /&gt;
+.normal-font[
+Source: [Fuzzy Logic (Surya, 2023)](https://www.geeksforgeeks.org/fuzzy-logic-introduction/)
+]
+---
+# Introduction I: Fuzzy Logic
+
+## In-detail
+.panelset[
+.panel[.panel-name[**Fuzzy sets**]
+
+- Decision: Whether the robot should brake
+
+- Speed: {Fast, Normal, Slow}
+
+- Distance to front obstacle: {Far, Mid, Close}
+
+- Final output threshold = 5
+
+&lt;br/&gt;
+
+Bounded sum (symmetric set difference): 
+$$ \mu A \oplus B (x) = min (1, \mu A (x) + \mu B (x) )  $$
+
+]
+.panel[.panel-name[**Fuzzyfication**]
+- Input: Current robot speed: 5.6; Distance: 1
+
+- Output:
+  
+  - Speed: {Fast: 0.1, Normal: 0.6, Slow: 0.3}
+  - Distance to front obstacle: {Far: 0, Mid: 0.2, Close: 0.8}
+
+]
+.panel[.panel-name[**Rule Base**]
+- Fire Strength(FS)
+
+  - Slow and Far = Max( 0.3, 0 ) = 0.3
+  
+  - Slow and Mid = 0.3
+  
+  - SC = 0.8
+  
+  - ...
+
+]
+.panel[.panel-name[**De-fuzzyfication**]
+
+.pull-left[
+#### Weighted average decision method
+
+- FS (Fire Strength)
+
+- OW (Output Wight): each degree has a weight
+&lt;br/&gt;
+
+Final output = 7.85 &gt; 5 =&gt; Should break
+]
+
+.pull-right[
+&lt;img src="./assets/qu_fuzzification.png" width="80%" style="display: block; margin: auto;" /&gt;
+]
+]
+]
+---
+# Introdcution II
+
+## Dynamic Window Approach
+
+$$ G(v, \omega) =  \sigma(\alpha \cdot heading + \beta \cdot dist + \gamma \cdot velocity) $$
+
+.pull-left[
+- objective function
+  
+  - Target heading: The Angle between the robot's current attitude direction and the target direction
+  
+  - Clearance: 'dist' is the distance of the nearest obstacle intersecting the arc of the robot's motion trajectory
+  
+  - Velocity
+]
+
+.pull-right[
+&lt;img src="./assets/dwa.png" width="70%" style="display: block; margin: auto;" /&gt;
+]
+
+.normal-font[
+Source: [Dynamic window approach (Fox et al.)](https://ieeexplore.ieee.org/iel1/100/12589/00580977.pdf?casa_token=gQZ8A8c7GXEAAAAA:5zmxG14BWkmFAs1BHm4qxYZRk9n0rv_Eqqn3AxY1NruZrP9Fo8SlMFo0875U7vZ4t6aDI29xNw)
+]
+---
+# Introdcution II: DWA
+
+&lt;p align="center"&gt;&lt;iframe width="560" height="315" src="./assets/ros.mp4" title="DWA algorithm simulates video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;&lt;/p&gt;
+
+
+&lt;br/&gt;
+
+.normal-font[
+Source: [DWA algorithm simulate (AtsushiSakai, 2020)](https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathPlanning)
+]
+
+---
+# System Structure
+
+#### 1. Aims to decrease the cost that will be used to guide the robot
+
+- Built on unity develpoment platform
+
+- Simplified movement
+
+- Equiped with one camer and Lidar
+
+#### 2. Maintain a relatively reliable accuracy
+
+- Known target location
+
+- Obstacles with fixed height
+
+---
+# System Structure: Robot
+
+- Each line `\(D_{n}\)` represents a LiDAR detection result in current state
+
+- The green cross-hire means detected front obstacle
+
+&lt;img src="./assets/functional_collision_avoidance.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+# System Structure: Algorithm
+
+.pull-left[
+1. Generate turning angles and speed array by current angle between the moving direction and the target point and robot velocity
+
+1. Evaluate the array combines with current situation
+$$ E = \alpha \cdot movement + \beta \cdot heading + \gamma \cdot obstacle  $$
+
+
+1. Pick best angle and speed and convert them to turning and acceleration (deceleration) commands
+]
+
+.pull-right[
+&lt;img src="./assets/angle_selection.png" width="75%" style="display: block; margin: auto;" /&gt;
+]
+---
+# Results
+
+- Smooth turn
+
+- Obstacle avoidance
+
+
+&lt;img src="./assets/scene_01_nr.png" width="50%" style="display: block; margin: auto;" /&gt;
+---
+# Limitation
+
+- ### Tested exclusively in flat environments.
+
+- ### The camera's power is often underestimated.
+
+- ### The system's frame rate affects the outcome.
+
+- ### Increasing the map's complexity can cause instability.
+
+---
+# References
+
+
+
+- 
+&lt;p&gt;&lt;cite&gt;Bai, Y. and D. Wang
+(2006).
+&amp;ldquo;Fundamentals of fuzzy logic control—fuzzy sets, fuzzy rules and defuzzifications&amp;rdquo;.
+In: &lt;em&gt;Advanced fuzzy logic technologies in industrial applications&lt;/em&gt;, pp. 17&amp;ndash;36.&lt;/cite&gt;&lt;/p&gt;
+- 
+&lt;p&gt;&lt;cite&gt;Fox, D., W. Burgard, and S. Thrun
+(1997).
+&amp;ldquo;The dynamic window approach to collision avoidance&amp;rdquo;.
+In: &lt;em&gt;IEEE Robotics &amp;amp; Automation Magazine&lt;/em&gt; 4.1, pp. 23&amp;ndash;33.&lt;/cite&gt;&lt;/p&gt;
+- 
+&lt;p&gt;&lt;cite&gt;Sakai, A.
+(2024).
+&lt;em&gt;PythonRobotics: PathPlanning&lt;/em&gt;.
+&lt;a href="https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathPlanning"&gt;https://github.com/AtsushiSakai/PythonRobotics/tree/master/PathPlanning&lt;/a&gt;.
+GitHub repository.&lt;/cite&gt;&lt;/p&gt;
+- 
+&lt;p&gt;&lt;cite&gt;Surya Priy, A. r.
+&lt;em&gt;Fuzzy Logic&lt;/em&gt;.
+URL: https://www.geeksforgeeks.org/fuzzy-logic-introduction/.&lt;/cite&gt;&lt;/p&gt;
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
