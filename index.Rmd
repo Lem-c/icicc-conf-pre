@@ -204,7 +204,6 @@ knitr::include_graphics('./assets/functional_collision_avoidance.png')
 1. Evaluate the array combines with current situation
 $$ E = \alpha \cdot movement + \beta \cdot heading + \gamma \cdot obstacle  $$
 
-
 1. Pick best angle and speed and convert them to turning and acceleration (deceleration) commands
 ]
 
@@ -225,7 +224,7 @@ knitr::include_graphics('./assets/angle_selection.png')
 knitr::include_graphics('./assets/scene_01_nr.png')
 ```
 ---
-# Limitation
+# Conclusion and Limitation
 
 - ### Tested exclusively in flat environments.
 
